@@ -21,13 +21,17 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.GoogleSignInResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
+import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.auth.GoogleAuthProvider;
 
 import za.co.developersjunction.projects.R;
 import za.co.developersjunction.projects.utils.ProgressClass;
@@ -64,6 +68,7 @@ public class SignUp extends Fragment implements View.OnClickListener
     private boolean valid_password;
 
     private boolean isSucc;
+    private boolean isIn;
 
     //Firebase global declaration
     private GoogleApiClient mGoogleApiClient;
@@ -161,7 +166,12 @@ public class SignUp extends Fragment implements View.OnClickListener
         }
         else if(btn_id == R.id.btn_google_sign_up)
         {
+            signIn();
 
+            /*if(isIn)
+            {
+                // startActivity(new Intent(SignInActivity.this,EventType.class));
+            }*/
         }
         else if(btn_id ==  R.id.btn_email_sign_up)
         {
@@ -257,7 +267,8 @@ public class SignUp extends Fragment implements View.OnClickListener
         mGoogleApiClient.disconnect();
     }
 
-    public void createAccount(Login l)
+    //Create account using email and password
+    private void createAccount(Login l)
     {
 
         mFirebaseAuth.createUserWithEmailAndPassword(l.getEmail(),l.getPassword())
@@ -283,4 +294,92 @@ public class SignUp extends Fragment implements View.OnClickListener
                     }
                 });
     }
+
+    //end of...
+
+    //Create account ausing gmail
+    private void signIn()
+    {
+        Intent signInIntent = Auth.GoogleSignInApi.getSignInIntent(mGoogleApiClient);
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data)
+    {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
+        if (requestCode == RC_SIGN_IN)
+        {
+            GoogleSignInResult result = Auth.GoogleSignInApi.getSignInResultFromIntent(data);
+            if (result.isSuccess())
+            {
+                // Google Sign In was successful, authenticate with Firebase
+                GoogleSignInAccount account = result.getSignInAccount();
+                firebaseAuthWithGoogle(account);
+
+            }
+            else
+            {
+                // Google Sign In failed, update UI appropriately
+                updateUI(null);
+            }
+        }
+    }
+
+    //[End onActivityResult]
+
+    //[start auth_with_google]
+    private void firebaseAuthWithGoogle(GoogleSignInAccount acct)
+    {
+        Log.d(TAG, "firebaseAuthWithGoogle:" + acct.getId());
+        // [START_EXCLUDE silent]
+        //showProgressDialog();
+        // [END_EXCLUDE]
+
+        AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
+
+        mFirebaseAuth.signInWithCredential(credential)
+                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>()
+                {
+                    @Override
+                    public void onComplete(@NonNull Task<AuthResult> task)
+                    {
+                        Log.d(TAG, "signInWithCredential:onComplete:" + task.isSuccessful());
+
+                        // If sign in fails, display a message to the user. If sign in succeeds
+                        // the auth state listener will be notified and logic to handle the
+                        // signed in user can be handled in the listener.
+
+                        if(!task.isSuccessful())
+                        {
+                            Log.w(TAG, "signInWithCredential", task.getException());
+                            Toast.makeText(getActivity(), "Authentication failed.",Toast.LENGTH_SHORT).show();
+                        }
+                        else
+                        {
+                            isIn = true;
+                        }
+
+                        // [START_EXCLUDE]
+                        // hideProgressDialog();
+                        // [END_EXCLUDE]
+                    }
+                });
+    }
+
+
+    private void updateUI(FirebaseUser user)
+    {
+        if(user != null)
+        {
+            Toast.makeText(getActivity(),"User : " + user.getEmail() + " \n ID : " + user.getUid(),Toast.LENGTH_LONG).show();
+        }
+        else
+        {
+            Toast.makeText(getActivity(),"Signed Out",Toast.LENGTH_LONG).show();
+        }
+    }
+
 }
