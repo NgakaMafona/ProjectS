@@ -19,6 +19,8 @@
             android:name=".SignInActivity"
             android:theme="@style/Theme.AppCompat.Light.NoActionBar">
         </activity>
+        <activity android:name=".loginTest">
+        </activity>
     </application>
 
 </manifest>
