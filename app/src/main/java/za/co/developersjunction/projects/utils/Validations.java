@@ -1,4 +1,4 @@
-package za.co.developersjunction.projects;
+package za.co.developersjunction.projects.utils;
 
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;

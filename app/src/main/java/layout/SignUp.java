@@ -3,17 +3,20 @@ package layout;
 
 import android.app.Fragment;
 //import android.support.v4.app.Fragment;
+import android.app.FragmentManager;
+import android.app.FragmentTransaction;
 import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.design.widget.TextInputLayout;
-import android.support.v4.app.FragmentActivity;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +30,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 
 import za.co.developersjunction.projects.R;
-import za.co.developersjunction.projects.Validations;
+import za.co.developersjunction.projects.utils.ProgressClass;
+import za.co.developersjunction.projects.utils.Validations;
 import za.co.developersjunction.projects.loginTest;
 import za.co.developersjunction.projects.pojo.Login;
 
@@ -43,6 +47,9 @@ public class SignUp extends Fragment implements View.OnClickListener
     private TextView tv_sign_up;
 
     View v;
+
+    //ImageButton
+    private ImageButton img_back;
 
     //TextInputLayout global declaration
     private TextInputLayout til_email;
@@ -66,6 +73,9 @@ public class SignUp extends Fragment implements View.OnClickListener
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
+    //Progress class to start and stop progress dialog
+    ProgressClass pc;
+
     public SignUp()
     {
         // Required empty public constructor
@@ -75,6 +85,9 @@ public class SignUp extends Fragment implements View.OnClickListener
     {
         // Inflate the layout for this fragment
         v = inflater.inflate(R.layout.fragment_sign_up, container, false);
+
+        //Initialise ImageButton
+        img_back = (ImageButton) v.findViewById(R.id.img_btn_back);
 
         //Initialise EditTexts
         edt_sign_in_email = (EditText) v.findViewById(R.id.edt_sign_in_email);
@@ -92,6 +105,7 @@ public class SignUp extends Fragment implements View.OnClickListener
         //set On click listeners for the buttons
         btn_google_signUp.setOnClickListener(this);
         btn_on_signUp.setOnClickListener(this);
+        img_back.setOnClickListener(this);
 
         mFirebaseAuth = FirebaseAuth.getInstance();
 
@@ -124,6 +138,8 @@ public class SignUp extends Fragment implements View.OnClickListener
             }
         };
 
+
+
         return v;
     }
 
@@ -132,12 +148,24 @@ public class SignUp extends Fragment implements View.OnClickListener
     {
         int btn_id = view.getId();
 
-        if(btn_id == R.id.btn_google_sign_up)
+        if(btn_id == R.id.img_btn_back)
+        {
+            SignIn signIn = new SignIn();
+
+            FragmentManager fm = getFragmentManager();
+            FragmentTransaction ft = fm.beginTransaction();
+
+            ft.add(R.id.container,signIn);
+            ft.commit();
+
+        }
+        else if(btn_id == R.id.btn_google_sign_up)
         {
 
         }
         else if(btn_id ==  R.id.btn_email_sign_up)
         {
+
             Validations val = new Validations();
             Login l;
 
@@ -189,13 +217,25 @@ public class SignUp extends Fragment implements View.OnClickListener
 
             if(valid_email && valid_password)
             {
+                pc = new ProgressClass();
+                pc.startProgressDialog(getActivity(),"Creating Account","Please wait...");
+
                 l = new Login(email,password);
+
                 createAccount(l);
 
-                if (isSucc)
+                Handler h = new Handler();
+
+                h.postDelayed(new Runnable()
                 {
-                    startActivity(new Intent(getActivity(),loginTest.class));
-                }
+                    @Override
+                    public void run()
+                    {
+                        pc.stopProgressDialoge();
+
+                        startActivity(new Intent(getActivity(),loginTest.class));
+                    }
+                },3000);
 
             }
         }
@@ -219,6 +259,7 @@ public class SignUp extends Fragment implements View.OnClickListener
 
     public void createAccount(Login l)
     {
+
         mFirebaseAuth.createUserWithEmailAndPassword(l.getEmail(),l.getPassword())
                 .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>()
                 {
@@ -230,12 +271,14 @@ public class SignUp extends Fragment implements View.OnClickListener
                             isSucc = false;
 
                             Toast.makeText(getActivity(),"Error creating account " + task.isSuccessful(),Toast.LENGTH_LONG).show();
+
+
                         }
                         else
                         {
                             isSucc = true;
 
-                            Toast.makeText(getActivity(),"Account Created Successfully" + task.isSuccessful(),Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(),"Account Created Successfully " + task.isSuccessful(),Toast.LENGTH_LONG).show();
                         }
                     }
                 });
