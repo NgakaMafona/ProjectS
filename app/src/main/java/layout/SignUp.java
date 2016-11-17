@@ -257,6 +257,7 @@ public class SignUp extends Fragment implements View.OnClickListener
     public void onStart()
     {
         super.onStart();
+
         mGoogleApiClient.connect();
     }
 
@@ -277,11 +278,13 @@ public class SignUp extends Fragment implements View.OnClickListener
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task)
                     {
+
+
                         if(!task.isSuccessful())
                         {
                             isSucc = false;
 
-                            Toast.makeText(getActivity(),"Error creating account " + task.isSuccessful(),Toast.LENGTH_LONG).show();
+                            Toast.makeText(getActivity(),"Error creating account " + task.isSuccessful() ,Toast.LENGTH_LONG).show();
 
 
                         }
@@ -340,8 +343,7 @@ public class SignUp extends Fragment implements View.OnClickListener
 
         AuthCredential credential = GoogleAuthProvider.getCredential(acct.getIdToken(), null);
 
-        mFirebaseAuth.signInWithCredential(credential)
-                .addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>()
+        mFirebaseAuth.signInWithCredential(credential).addOnCompleteListener(getActivity(), new OnCompleteListener<AuthResult>()
                 {
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task)
