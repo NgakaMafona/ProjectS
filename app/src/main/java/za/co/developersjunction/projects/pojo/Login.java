@@ -1,5 +1,7 @@
 package za.co.developersjunction.projects.pojo;
 
+import za.co.developersjunction.projects.pojo.address.Address;
+
 /**
  * Created by Codetribe on 10/31/2016.
  */

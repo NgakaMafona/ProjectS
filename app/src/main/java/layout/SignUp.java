@@ -32,8 +32,11 @@ import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import za.co.developersjunction.projects.R;
+import za.co.developersjunction.projects.pojo.user.User;
 import za.co.developersjunction.projects.utils.ProgressClass;
 import za.co.developersjunction.projects.utils.Validations;
 import za.co.developersjunction.projects.loginTest;
@@ -51,6 +54,8 @@ public class SignUp extends Fragment implements View.OnClickListener
     private TextView tv_sign_up;
 
     View v;
+
+    User u;
 
     //ImageButton
     private ImageButton img_back;
@@ -74,9 +79,12 @@ public class SignUp extends Fragment implements View.OnClickListener
     private GoogleApiClient mGoogleApiClient;
     private FirebaseAuth mFirebaseAuth;
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private DatabaseReference db;
 
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
+
+
 
     //Progress class to start and stop progress dialog
     ProgressClass pc;
@@ -143,8 +151,6 @@ public class SignUp extends Fragment implements View.OnClickListener
             }
         };
 
-
-
         return v;
     }
 
@@ -168,10 +174,21 @@ public class SignUp extends Fragment implements View.OnClickListener
         {
             signIn();
 
-            /*if(isIn)
+            u = new User();
+
+            Handler h = new Handler();
+
+            h.postDelayed(new Runnable()
             {
-                // startActivity(new Intent(SignInActivity.this,EventType.class));
-            }*/
+                @Override
+                public void run()
+                {
+                    pc.stopProgressDialoge();
+
+                    startActivity(new Intent(getActivity(),loginTest.class));
+                }
+            },3000);
+
         }
         else if(btn_id ==  R.id.btn_email_sign_up)
         {
@@ -227,6 +244,8 @@ public class SignUp extends Fragment implements View.OnClickListener
 
             if(valid_email && valid_password)
             {
+                u = new User();
+
                 pc = new ProgressClass();
                 pc.startProgressDialog(getActivity(),"Creating Account","Please wait...");
 
@@ -258,14 +277,21 @@ public class SignUp extends Fragment implements View.OnClickListener
     {
         super.onStart();
 
-        mGoogleApiClient.connect();
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+       // mGoogleApiClient.connect();
     }
 
     @Override
     public void onStop()
     {
         super.onStop();
-        mGoogleApiClient.disconnect();
+
+        if(mAuthStateListener != null)
+        {
+            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        }
+
+       // mGoogleApiClient.disconnect();
     }
 
     //Create account using email and password
@@ -290,6 +316,10 @@ public class SignUp extends Fragment implements View.OnClickListener
                         }
                         else
                         {
+                            db = FirebaseDatabase.getInstance().getReference();
+
+                            db.child("User").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(u);
+
                             isSucc = true;
 
                             Toast.makeText(getActivity(),"Account Created Successfully " + task.isSuccessful(),Toast.LENGTH_LONG).show();
@@ -310,6 +340,9 @@ public class SignUp extends Fragment implements View.OnClickListener
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
+        pc = new ProgressClass();
+        pc.startProgressDialog(getActivity(),"Creating Account","Please wait...");
+
         super.onActivityResult(requestCode, resultCode, data);
 
         // Result returned from launching the Intent from GoogleSignInApi.getSignInIntent(...);
@@ -358,10 +391,15 @@ public class SignUp extends Fragment implements View.OnClickListener
                         {
                             Log.w(TAG, "signInWithCredential", task.getException());
                             Toast.makeText(getActivity(), "Authentication failed.",Toast.LENGTH_SHORT).show();
+                            pc.stopProgressDialoge();
                         }
                         else
                         {
                             isIn = true;
+
+                            db = FirebaseDatabase.getInstance().getReference();
+
+                            db.child("User").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(u);
                         }
 
                         // [START_EXCLUDE]
