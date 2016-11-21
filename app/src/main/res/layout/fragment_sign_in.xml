@@ -29,7 +29,6 @@
             android:id="@+id/tv_title"
             android:fontFamily="cursive"
             android:textSize="50dp"
-            android:textColor="@android:color/black"
             android:layout_gravity="center"/>
 
         <android.support.design.widget.TextInputLayout

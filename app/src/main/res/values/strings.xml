@@ -3,7 +3,7 @@
 
     <string name="sign_in_label">Sign in or Sign up</string>
     <string name="btn_google_sign_in">Using G-Mail</string>
-    <string name="btn_email_sign_in">Other Email</string>
+    <string name="btn_email_sign_in">Sign In</string>
     <string name="btn_email_sign_up">Sign Up</string>
 
     <string name="edt_sign_in_email">Email</string>

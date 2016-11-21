@@ -138,9 +138,12 @@ public class SignUp extends Fragment implements View.OnClickListener
             public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
             {
                 FirebaseUser user = firebaseAuth.getCurrentUser();
+
                 if(user != null)
                 {
                     // User is signed in
+                    startActivity(new Intent(getActivity(),loginTest.class));
+
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 }
                 else
@@ -178,14 +181,17 @@ public class SignUp extends Fragment implements View.OnClickListener
 
             Handler h = new Handler();
 
+           // pc = new ProgressClass();
+            //pc.startProgressDialog(getActivity(),"Creating Account","Please wait...");
+
             h.postDelayed(new Runnable()
             {
                 @Override
                 public void run()
                 {
-                    pc.stopProgressDialoge();
 
-                    startActivity(new Intent(getActivity(),loginTest.class));
+                    //pc.stopProgressDialoge();
+                    //startActivity(new Intent(getActivity(),loginTest.class));
                 }
             },3000);
 
@@ -260,9 +266,21 @@ public class SignUp extends Fragment implements View.OnClickListener
                     @Override
                     public void run()
                     {
-                        pc.stopProgressDialoge();
 
-                        startActivity(new Intent(getActivity(),loginTest.class));
+                        if(isSucc)
+                        {
+                            db = FirebaseDatabase.getInstance().getReference();
+
+                            db.child("User").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(u);
+
+                            pc.stopProgressDialoge();
+
+                            startActivity(new Intent(getActivity(),loginTest.class));
+                        }
+                        else
+                        {
+                            Toast.makeText(getActivity(),"Error ctrating account",Toast.LENGTH_LONG).show();
+                        }
                     }
                 },3000);
 
@@ -310,19 +328,13 @@ public class SignUp extends Fragment implements View.OnClickListener
                         {
                             isSucc = false;
 
-                            Toast.makeText(getActivity(),"Error creating account " + task.isSuccessful() ,Toast.LENGTH_LONG).show();
-
-
+                           // Toast.makeText(getActivity(),"Error creating account " + task.isSuccessful() ,Toast.LENGTH_LONG).show();
                         }
                         else
                         {
-                            db = FirebaseDatabase.getInstance().getReference();
-
-                            db.child("User").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(u);
-
                             isSucc = true;
 
-                            Toast.makeText(getActivity(),"Account Created Successfully " + task.isSuccessful(),Toast.LENGTH_LONG).show();
+                           // Toast.makeText(getActivity(),"Account Created Successfully " + task.isSuccessful(),Toast.LENGTH_LONG).show();
                         }
                     }
                 });
@@ -340,8 +352,7 @@ public class SignUp extends Fragment implements View.OnClickListener
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data)
     {
-        pc = new ProgressClass();
-        pc.startProgressDialog(getActivity(),"Creating Account","Please wait...");
+
 
         super.onActivityResult(requestCode, resultCode, data);
 
@@ -362,6 +373,8 @@ public class SignUp extends Fragment implements View.OnClickListener
                 updateUI(null);
             }
         }
+
+//        pc.stopProgressDialoge();
     }
 
     //[End onActivityResult]
@@ -396,10 +409,14 @@ public class SignUp extends Fragment implements View.OnClickListener
                         else
                         {
                             isIn = true;
+                            if(isIn)
+                            {
+                                db = FirebaseDatabase.getInstance().getReference();
 
-                            db = FirebaseDatabase.getInstance().getReference();
+                                db.child("User").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(u);
+                            }
 
-                            db.child("User").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(u);
+
                         }
 
                         // [START_EXCLUDE]
