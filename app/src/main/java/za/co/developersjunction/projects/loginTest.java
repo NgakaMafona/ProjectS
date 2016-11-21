@@ -7,6 +7,9 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.ImageButton;
+import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.google.android.gms.auth.api.Auth;
@@ -15,6 +18,13 @@ import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 public class loginTest extends AppCompatActivity
 {
@@ -22,6 +32,18 @@ public class loginTest extends AppCompatActivity
     private GoogleApiClient mGoogleApiClient;
 
     private FirebaseAuth.AuthStateListener mAuthStateListener;
+    private FirebaseStorage mStorage;
+
+    private ImageButton img_btn_corp;
+    private ImageButton img_btn_soci;
+
+    DatabaseReference mDataRef;
+
+    StorageReference storage_ref;
+    StorageReference loc_ref;
+    StorageReference img_ref;
+
+    ImageView img_cop;
 
     @Override
     protected void onCreate(Bundle savedInstanceState)
@@ -29,7 +51,22 @@ public class loginTest extends AppCompatActivity
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_test);
 
+        //getActionBar().setDisplayHomeAsUpEnabled(true);
+
+        img_btn_corp = (ImageButton) findViewById(R.id.img_corp);
+        img_btn_soci = (ImageButton) findViewById(R.id.img_soc);
+
         mFirebaseAuth = FirebaseAuth.getInstance();
+        mStorage = FirebaseStorage.getInstance();
+
+        storage_ref = mStorage.getReferenceFromUrl("gs://project-s-initial.appspot.com");
+
+        loc_ref = storage_ref.child("images");
+        img_ref = storage_ref.child("images/event_type_img/corp.jpg");
+
+        String path = img_ref.getPath();
+
+
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
         {
@@ -52,6 +89,7 @@ public class loginTest extends AppCompatActivity
                 }
             }
         };
+
     }
 
     private void signOut()
@@ -99,7 +137,7 @@ public class loginTest extends AppCompatActivity
 
             FirebaseAuth.getInstance().signOut();
 
-            Toast.makeText(this, "Wana sign out", Toast.LENGTH_SHORT).show();
+            Toast.makeText(this, "signed out", Toast.LENGTH_SHORT).show();
 
             startActivity(new Intent(this,SignInActivity.class));
 
