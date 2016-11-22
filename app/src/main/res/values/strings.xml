@@ -11,6 +11,12 @@
 
     <string name="edt_or">or</string>
 
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
+    <!-- Fragment Profile Setup String Values -->
+    <string name="f_name">First Name</string>
+    <string name="l_name">Last Name</string>
+    <string name="gender_male">Male</string>
+    <string name="gender_female">Female</string>
+    <string name="id_number">ID Number</string>
+    <string name="create_pro">Create Profile</string>
+
 </resources>

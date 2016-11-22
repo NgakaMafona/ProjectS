@@ -84,8 +84,6 @@ public class SignUp extends Fragment implements View.OnClickListener
     private static final String TAG = "SignInActivity";
     private static final int RC_SIGN_IN = 9001;
 
-
-
     //Progress class to start and stop progress dialog
     ProgressClass pc;
 
@@ -142,7 +140,6 @@ public class SignUp extends Fragment implements View.OnClickListener
                 if(user != null)
                 {
                     // User is signed in
-                    startActivity(new Intent(getActivity(),loginTest.class));
 
                     Log.d(TAG, "onAuthStateChanged:signed_in:" + user.getUid());
                 }
@@ -153,6 +150,8 @@ public class SignUp extends Fragment implements View.OnClickListener
                 }
             }
         };
+
+
 
         return v;
     }
@@ -267,20 +266,30 @@ public class SignUp extends Fragment implements View.OnClickListener
                     public void run()
                     {
 
-                        if(isSucc)
-                        {
+                        //if(isSucc)
+                        //{
                             db = FirebaseDatabase.getInstance().getReference();
 
                             db.child("User").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(u);
 
                             pc.stopProgressDialoge();
 
-                            startActivity(new Intent(getActivity(),loginTest.class));
-                        }
-                        else
-                        {
-                            Toast.makeText(getActivity(),"Error ctrating account",Toast.LENGTH_LONG).show();
-                        }
+                            SignIn signIn = new SignIn();
+
+                            ProfileSetUp prf = new ProfileSetUp();
+
+                            FragmentManager fm = getFragmentManager();
+                            FragmentTransaction ft = fm.beginTransaction();
+
+                            ft.add(R.id.container,prf);
+                            ft.commit();
+
+                      //  }
+                        //else
+                        //{
+                            pc.stopProgressDialoge();
+                            //Toast.makeText(getActivity(),"Error creating account",Toast.LENGTH_LONG).show();
+                        //}
                     }
                 },3000);
 
@@ -322,8 +331,6 @@ public class SignUp extends Fragment implements View.OnClickListener
                     @Override
                     public void onComplete(@NonNull Task<AuthResult> task)
                     {
-
-
                         if(!task.isSuccessful())
                         {
                             isSucc = false;

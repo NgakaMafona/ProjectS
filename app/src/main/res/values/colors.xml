@@ -6,4 +6,5 @@
 
     <color name="colorButtonBackground">#33BDBDBD</color>
     <color name="colorMainLayoutTint">#339399AC</color>
+    <color name="colorText">#616161</color>
 </resources>
