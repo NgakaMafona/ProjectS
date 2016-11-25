@@ -59,14 +59,12 @@ public class loginTest extends AppCompatActivity
         mFirebaseAuth = FirebaseAuth.getInstance();
         mStorage = FirebaseStorage.getInstance();
 
-        storage_ref = mStorage.getReferenceFromUrl("gs://project-s-initial.appspot.com");
+       // storage_ref = mStorage.getReferenceFromUrl("gs://project-s-initial.appspot.com");
 
-        loc_ref = storage_ref.child("images");
-        img_ref = storage_ref.child("images/event_type_img/corp.jpg");
+        //loc_ref = storage_ref.child("images");
+        //img_ref = storage_ref.child("images/event_type_img/corp.jpg");
 
-        String path = img_ref.getPath();
-
-
+        //String path = img_ref.getPath();
 
         mAuthStateListener = new FirebaseAuth.AuthStateListener()
         {
@@ -97,14 +95,14 @@ public class loginTest extends AppCompatActivity
         mFirebaseAuth.signOut();
 
         //google sign out
-        Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>()
+        /*Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>()
         {
             @Override
             public void onResult(@NonNull Status status)
             {
                 updateUI(null);
             }
-        });
+        });*/
     }
     private void updateUI(FirebaseUser user)
     {
@@ -133,7 +131,7 @@ public class loginTest extends AppCompatActivity
 
         if(id == R.id.sign_out)
         {
-            //signOut();
+            signOut();
 
             FirebaseAuth.getInstance().signOut();
 

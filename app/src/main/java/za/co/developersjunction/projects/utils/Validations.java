@@ -1,5 +1,6 @@
 package za.co.developersjunction.projects.utils;
 
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -78,6 +79,54 @@ public class Validations
             {
                 valid = false;
                 break;
+            }
+        }
+
+        return valid;
+    }
+
+    public boolean isValidID(String id)
+    {
+        boolean valid = false;
+
+        String subYear = id.substring(0,2);
+
+        int birth_year = Integer.parseInt(subYear);
+
+        String y = "";
+
+        if(birth_year > 16 && birth_year <=99)
+        {
+            y = "19"+birth_year;
+        }
+        else
+        {
+            y = "20"+birth_year;
+        }
+
+        int bYear= Integer.parseInt(y);
+
+        //get current year
+        Date date = new Date();
+        String str_year = date.toString();
+        String a = str_year.substring(30);
+
+        int current_year = Integer.parseInt(a);
+
+
+        if(id.length() != 13)
+        {
+            valid = false;
+        }
+        else
+        {
+            if(bYear >= current_year)
+            {
+                valid = false;
+            }
+            else
+            {
+                valid = true;
             }
         }
 

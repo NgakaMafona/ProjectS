@@ -87,6 +87,9 @@ public class SignUp extends Fragment implements View.OnClickListener
     //Progress class to start and stop progress dialog
     ProgressClass pc;
 
+    //Login object
+    Login l;
+
     public SignUp()
     {
         // Required empty public constructor
@@ -152,7 +155,6 @@ public class SignUp extends Fragment implements View.OnClickListener
         };
 
 
-
         return v;
     }
 
@@ -174,32 +176,25 @@ public class SignUp extends Fragment implements View.OnClickListener
         }
         else if(btn_id == R.id.btn_google_sign_up)
         {
-            signIn();
 
-            u = new User();
+            pc = new ProgressClass();
+            pc.startProgressDialog(getActivity(),"Authenticating Account","Please wait...");
 
-            Handler h = new Handler();
-
-           // pc = new ProgressClass();
-            //pc.startProgressDialog(getActivity(),"Creating Account","Please wait...");
-
-            h.postDelayed(new Runnable()
+            new Thread(new Runnable()
             {
                 @Override
                 public void run()
                 {
-
-                    //pc.stopProgressDialoge();
-                    //startActivity(new Intent(getActivity(),loginTest.class));
+                    signIn();
                 }
-            },3000);
+            }).start();
 
         }
         else if(btn_id ==  R.id.btn_email_sign_up)
         {
 
             Validations val = new Validations();
-            Login l;
+
 
             //get text from edittexts
             String email = edt_sign_in_email.getText().toString();
@@ -252,11 +247,18 @@ public class SignUp extends Fragment implements View.OnClickListener
                 u = new User();
 
                 pc = new ProgressClass();
-                pc.startProgressDialog(getActivity(),"Creating Account","Please wait...");
+                pc.startProgressDialog(getActivity(),"Authenticating","Please wait...");
 
                 l = new Login(email,password);
 
-                createAccount(l);
+                new Thread(new Runnable()
+                {
+                    @Override
+                    public void run()
+                    {
+                        createAccount(l);
+                    }
+                }).start();
 
                 Handler h = new Handler();
 
@@ -266,15 +268,15 @@ public class SignUp extends Fragment implements View.OnClickListener
                     public void run()
                     {
 
-                        //if(isSucc)
-                        //{
+                        if(isSucc)
+                        {
                             db = FirebaseDatabase.getInstance().getReference();
 
                             db.child("User").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(u);
 
                             pc.stopProgressDialoge();
 
-                            SignIn signIn = new SignIn();
+                           // SignIn signIn = new SignIn();
 
                             ProfileSetUp prf = new ProfileSetUp();
 
@@ -283,13 +285,12 @@ public class SignUp extends Fragment implements View.OnClickListener
 
                             ft.add(R.id.container,prf);
                             ft.commit();
-
-                      //  }
-                        //else
-                        //{
+                        }
+                        else
+                        {
                             pc.stopProgressDialoge();
-                            //Toast.makeText(getActivity(),"Error creating account",Toast.LENGTH_LONG).show();
-                        //}
+                            Toast.makeText(getActivity(),"Error creating account",Toast.LENGTH_LONG).show();
+                        }
                     }
                 },3000);
 
@@ -371,6 +372,12 @@ public class SignUp extends Fragment implements View.OnClickListener
             {
                 // Google Sign In was successful, authenticate with Firebase
                 GoogleSignInAccount account = result.getSignInAccount();
+
+                pc.stopProgressDialoge();
+
+                pc = new ProgressClass();
+                pc.startProgressDialog(getActivity(),"Creating Account","Please wait...");
+
                 firebaseAuthWithGoogle(account);
 
             }
@@ -381,7 +388,7 @@ public class SignUp extends Fragment implements View.OnClickListener
             }
         }
 
-//        pc.stopProgressDialoge();
+
     }
 
     //[End onActivityResult]
@@ -421,13 +428,22 @@ public class SignUp extends Fragment implements View.OnClickListener
                                 db = FirebaseDatabase.getInstance().getReference();
 
                                 db.child("User").child(mFirebaseAuth.getCurrentUser().getUid()).setValue(u);
+
+                                ProfileSetUp prf = new ProfileSetUp();
+
+                                FragmentManager fm = getFragmentManager();
+                                FragmentTransaction ft = fm.beginTransaction();
+
+                                ft.add(R.id.container,prf);
+                                ft.commit();
                             }
 
-
+                            pc.stopProgressDialoge();
                         }
 
                         // [START_EXCLUDE]
                         // hideProgressDialog();
+                       // ;
                         // [END_EXCLUDE]
                     }
                 });
@@ -445,5 +461,7 @@ public class SignUp extends Fragment implements View.OnClickListener
             Toast.makeText(getActivity(),"Signed Out",Toast.LENGTH_LONG).show();
         }
     }
+
+
 
 }

@@ -256,9 +256,18 @@ public class SignIn extends Fragment implements View.OnClickListener
         }
         else if(btn_id == R.id.btn_google_sign_in)
         {
-            onSignIn();
 
-            Handler h = new Handler();
+            new Thread(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    onSignIn();
+                }
+            }).start();
+
+
+            /*Handler h = new Handler();
 
             h.postDelayed(new Runnable()
             {
@@ -277,7 +286,7 @@ public class SignIn extends Fragment implements View.OnClickListener
                         Toast.makeText(getActivity(), "Account not Registered", Toast.LENGTH_LONG).show();
                     }
                 }
-            },3000);
+            },2000);*/
         }
     }
 
@@ -391,6 +400,9 @@ public class SignIn extends Fragment implements View.OnClickListener
                         else
                         {
                             isSucc = true;
+
+                            startActivity(new Intent(getActivity(), loginTest.class));
+
                             Toast.makeText(getActivity(),"Login Success", Toast.LENGTH_LONG).show();
                         }
                     }
