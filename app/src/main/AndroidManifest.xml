@@ -21,13 +21,18 @@
         </activity>
         <activity
             android:name=".loginTest"
+            android:label="@string/lbl_event_type_header"
             android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
-
+        </activity>
+        <activity
+            android:name=".EventsActivity"
+            android:label="Available Events"
+            android:theme="@style/Theme.AppCompat.DayNight.DarkActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
                 android:value=".loginTest">
-
             </meta-data>
+
         </activity>
     </application>
 

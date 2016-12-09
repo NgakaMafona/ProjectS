@@ -152,6 +152,8 @@ public class SignIn extends Fragment implements View.OnClickListener
                 if(user != null)
                 {
                     Log.d("MADE_IT_IN" , "Signed in :" + user.getUid());
+                    startActivity(new Intent(getActivity(), loginTest.class));
+                    getActivity().finish();
 
                 }
                 else
@@ -243,6 +245,8 @@ public class SignIn extends Fragment implements View.OnClickListener
                         if(isSucc)
                         {
                             startActivity(new Intent(getActivity(), loginTest.class));
+
+                            getActivity().finish();
                         }
                         else
                         {
@@ -287,28 +291,6 @@ public class SignIn extends Fragment implements View.OnClickListener
                     }
                 }
             },2000);*/
-        }
-    }
-
-    //OnStart
-    @Override
-    public void onStart()
-    {
-        super.onStart();
-
-        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
-
-    }
-
-    //OnStop
-
-    @Override
-    public void onStop()
-    {
-        super.onStop();
-        if(mAuthStateListener == null)
-        {
-            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
         }
     }
 
@@ -401,8 +383,6 @@ public class SignIn extends Fragment implements View.OnClickListener
                         {
                             isSucc = true;
 
-                            startActivity(new Intent(getActivity(), loginTest.class));
-
                             Toast.makeText(getActivity(),"Login Success", Toast.LENGTH_LONG).show();
                         }
                     }
@@ -411,4 +391,25 @@ public class SignIn extends Fragment implements View.OnClickListener
         pc.stopProgressDialoge();
     }
     //[End of Google Sign in]
+
+    //OnStart
+    @Override
+    public void onStart()
+    {
+        super.onStart();
+
+        mFirebaseAuth.addAuthStateListener(mAuthStateListener);
+
+    }
+
+    //OnStop
+    @Override
+    public void onStop()
+    {
+        super.onStop();
+        if(mAuthStateListener == null)
+        {
+            mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        }
+    }
 }

@@ -19,4 +19,7 @@
     <string name="id_number">ID Number</string>
     <string name="create_pro">Create Profile</string>
 
+    <!--Lable headers -->
+    <string name="lbl_event_type_header">Choose an Event Type</string>
+
 </resources>

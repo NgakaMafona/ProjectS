@@ -1,6 +1,8 @@
 package za.co.developersjunction.projects;
 
 import android.content.Intent;
+import android.content.SharedPreferences;
+import android.os.Handler;
 import android.support.annotation.NonNull;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -8,6 +10,8 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.Toast;
@@ -26,7 +30,7 @@ import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 
-public class loginTest extends AppCompatActivity
+public class loginTest extends AppCompatActivity implements View.OnClickListener
 {
     private FirebaseAuth mFirebaseAuth;
     private GoogleApiClient mGoogleApiClient;
@@ -45,20 +49,46 @@ public class loginTest extends AppCompatActivity
 
     ImageView img_cop;
 
+    private String ev_type = "";
+    private String cur_user_email;
+
+    public static final String CATAGORY_TAG = "category";
+
     @Override
     protected void onCreate(Bundle savedInstanceState)
     {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login_test);
 
-        //getActionBar().setDisplayHomeAsUpEnabled(true);
-
-        img_btn_corp = (ImageButton) findViewById(R.id.img_corp);
         img_btn_soci = (ImageButton) findViewById(R.id.img_soc);
+        img_btn_corp = (ImageButton) findViewById(R.id.img_corp);
+
+        Handler h = new Handler();
+
+        h.postDelayed(new Runnable()
+        {
+            @Override
+            public void run()
+            {
+                Animation fade_img_soc = AnimationUtils.loadAnimation(loginTest.this, R.anim.fade_in);
+                img_btn_soci.setVisibility(View.VISIBLE);
+                img_btn_soci.setAnimation(fade_img_soc);
+                img_btn_corp.setVisibility(View.VISIBLE);
+                img_btn_corp.setAnimation(fade_img_soc);
+            }
+        },1000);
+
+        //set on click listerners for image buttons
+        img_btn_soci.setOnClickListener(this);
+        img_btn_corp.setOnClickListener(this);
+
 
         mFirebaseAuth = FirebaseAuth.getInstance();
         mStorage = FirebaseStorage.getInstance();
 
+        FirebaseUser user = mFirebaseAuth.getCurrentUser();
+
+        cur_user_email = user.getEmail();
        // storage_ref = mStorage.getReferenceFromUrl("gs://project-s-initial.appspot.com");
 
         //loc_ref = storage_ref.child("images");
@@ -66,43 +96,12 @@ public class loginTest extends AppCompatActivity
 
         //String path = img_ref.getPath();
 
-        mAuthStateListener = new FirebaseAuth.AuthStateListener()
-        {
-            @Override
-            public void onAuthStateChanged(@NonNull FirebaseAuth firebaseAuth)
-            {
-                FirebaseUser user = firebaseAuth.getCurrentUser();
-
-                if(user != null)
-                {
-                    // User is signed in
-                    Log.d("Sign in Tag", "onAuthStateChanged:signed_in:" + user.getUid());
-                }
-                else
-                {
-                    startActivity(new Intent(loginTest.this, SignInActivity.class));
-
-                    // User is signed out
-                    Log.d("Sign Out Tag", "onAuthStateChanged:signed_out");
-                }
-            }
-        };
-
     }
 
     private void signOut()
     {
         mFirebaseAuth.signOut();
 
-        //google sign out
-        /*Auth.GoogleSignInApi.signOut(mGoogleApiClient).setResultCallback(new ResultCallback<Status>()
-        {
-            @Override
-            public void onResult(@NonNull Status status)
-            {
-                updateUI(null);
-            }
-        });*/
     }
     private void updateUI(FirebaseUser user)
     {
@@ -138,13 +137,14 @@ public class loginTest extends AppCompatActivity
             Toast.makeText(this, "signed out", Toast.LENGTH_SHORT).show();
 
             startActivity(new Intent(this,SignInActivity.class));
+            finish();
 
         }
 
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
+    /*@Override
     protected void onStop()
     {
         super.onStop();
@@ -154,6 +154,78 @@ public class loginTest extends AppCompatActivity
         if(mAuthStateListener != null)
         {
             mFirebaseAuth.removeAuthStateListener(mAuthStateListener);
+        }
+    }*/
+
+    @Override
+    public void onClick(View view)
+    {
+        int id = view.getId();
+
+        SharedPreferences sp = getSharedPreferences("event_data",MODE_PRIVATE);
+        SharedPreferences.Editor ed = sp.edit();
+
+        if(id == R.id.img_soc)
+        {
+            //Toast.makeText(this,cur_user_email,Toast.LENGTH_LONG).show();
+
+            ev_type = "Social";
+
+            ed.putString("user_email",cur_user_email);
+            ed.putString("event_type", ev_type);
+            ed.commit();
+
+            Animation fade_out = AnimationUtils.loadAnimation(loginTest.this, R.anim.fade_out);
+            img_btn_soci.setAnimation(fade_out);
+            img_btn_soci.setVisibility(View.INVISIBLE);
+            img_btn_corp.setAnimation(fade_out);
+            img_btn_corp.setVisibility(View.INVISIBLE);
+
+            Handler h = new Handler();
+            h.postDelayed(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    Intent i = new Intent(loginTest.this,EventsActivity.class);
+                    i.putExtra(CATAGORY_TAG,ev_type);
+
+                    startActivity(i);
+                    finish();
+                }
+            },1500);
+
+
+        }
+        else if(id == R.id.img_corp)
+        {
+            ev_type = "Corporate";
+
+            ed.putString("user_email",cur_user_email);
+            ed.putString("event_type", ev_type);
+            ed.commit();
+
+            Animation fade_out = AnimationUtils.loadAnimation(loginTest.this, R.anim.fade_out);
+            img_btn_soci.setAnimation(fade_out);
+            img_btn_soci.setVisibility(View.INVISIBLE);
+            img_btn_corp.setAnimation(fade_out);
+            img_btn_corp.setVisibility(View.INVISIBLE);
+
+            Handler h = new Handler();
+            h.postDelayed(new Runnable()
+            {
+                @Override
+                public void run()
+                {
+                    Intent i = new Intent(loginTest.this,EventsActivity.class);
+                    i.putExtra(CATAGORY_TAG,ev_type);
+
+                    startActivity(i);
+                    finish();
+                }
+            },1500);
+
+            //Toast.makeText(this,cur_user_email,Toast.LENGTH_LONG).show();
         }
     }
 }

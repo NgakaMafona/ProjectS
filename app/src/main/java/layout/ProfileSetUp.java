@@ -215,6 +215,7 @@ public class ProfileSetUp extends Fragment implements RadioGroup.OnCheckedChange
                 addUser(u);
 
                 startActivity(new Intent(getActivity(),loginTest.class));
+                getActivity().finish();
             }
         }
 

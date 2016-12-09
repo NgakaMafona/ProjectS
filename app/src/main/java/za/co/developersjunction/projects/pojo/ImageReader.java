@@ -1,7 +1,7 @@
 package za.co.developersjunction.projects.pojo;
 
 /**
- * Created by Codetribe on 11/21/2016.
+ * Created by Phil on 11/21/2016.
  */
 
 public class ImageReader

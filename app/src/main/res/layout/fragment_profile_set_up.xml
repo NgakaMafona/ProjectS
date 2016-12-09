@@ -7,7 +7,7 @@
             android:paddingRight="@dimen/frag_horizontal_margin"
             android:paddingTop="@dimen/frag_vertical_margin"
             tools:context="layout.ProfileSetUp"
-            android:background="@drawable/img_dawn_landscape_mountains_nature">
+            android:background="@drawable/vintage_mic">
 
     <FrameLayout android:layout_width="match_parent"
                  android:layout_height="match_parent">

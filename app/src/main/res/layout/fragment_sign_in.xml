@@ -7,7 +7,7 @@
              android:paddingRight="@dimen/frag_horizontal_margin"
              android:paddingTop="@dimen/frag_vertical_margin"
              tools:context="layout.SignIn"
-             android:background="@drawable/img_dawn_landscape_mountains_nature">
+             android:background="@drawable/vintage_mic">
 
     <LinearLayout
         android:layout_gravity="center"
